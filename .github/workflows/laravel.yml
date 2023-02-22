@@ -1,0 +1,30 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  laravel-deployment:
+
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout and fetch
+        working-directory: /var/www/html/api-connector
+        run: |
+          git checkout -- .
+          git pull origin master
+      - name: Install Dependencies
+        working-directory: /var/www/html/api-connector
+        run: |
+          composer install --no-dev
+          npm install
+          npm run dev
+      - name: Migrate and clear configs
+        working-directory: /var/www/html/api-connector
+        run: |
+          php artisan config:clear
+          php artisan migrate
+          php artisan db:seed
+          php artisan config:clear
